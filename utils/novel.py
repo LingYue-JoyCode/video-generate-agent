@@ -52,7 +52,7 @@ def split_sentences(text: str) -> list:
     return sentences
 
 
-def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> dict:
+def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> str:
     """
     读取小说内容
     返回: {"content": str, "finished": bool}
@@ -81,13 +81,15 @@ def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> dict:
     
     try:
         with open(novel_file_path, "r", encoding=encoding) as f:
-            f.seek(offset)
+            # 使用字符偏移量，先读取到指定位置
+            if offset > 0:
+                f.read(offset)
             raw_text = f.read(chunk_size * 2)
     except Exception:
         raise RuntimeError("无法读取文件")
     
     if not raw_text:
-        return {"content": "", "finished": True}
+        return ""
     
     # 分句处理
     sentences = split_sentences(raw_text)
@@ -102,15 +104,14 @@ def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> dict:
     if not selected_text:
         selected_text = raw_text[:chunk_size]
     
-    # 更新缓存
-    new_offset = offset + len(selected_text.encode(encoding))
+    # 更新缓存 - 使用字符偏移量而不是字节偏移量
+    # 计算已读取的字符数
+    chars_read = len(selected_text)
+    new_offset = offset + chars_read
     try:
         with open(cache_path, "w", encoding="utf-8") as f:
             json.dump({"offset": new_offset}, f)
     except Exception:
         pass
     
-    return {
-        "content": selected_text,
-        "finished": False
-    }
+    return selected_text

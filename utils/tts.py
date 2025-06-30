@@ -3,7 +3,12 @@ import pysrt
 from typing import Optional, List, Tuple
 from datetime import timedelta
 from pydub import AudioSegment
-from indextts.infer import IndexTTS
+
+try:
+    from indextts.infer import IndexTTS
+except ImportError:
+    IndexTTS = None
+    print("警告: IndexTTS 模块未安装，音频生成功能将不可用")
 
 
 def generate_audio(text: str, audio_path: str, srt_path: Optional[str] = None, voice_type: str = "narrator"):
@@ -36,6 +41,9 @@ def generate_audio(text: str, audio_path: str, srt_path: Optional[str] = None, v
         voice = "assets/voice/zh.wav"
     
     # 使用IndexTTS生成音频
+    if IndexTTS is None:
+        raise ImportError("IndexTTS 模块未安装，无法生成音频")
+        
     tts = IndexTTS(model_dir="index-tts/checkpoints", cfg_path="index-tts/checkpoints/config.yaml")
     tts.infer(voice, text, audio_path)
     
@@ -222,9 +230,23 @@ def merge_srt_files(srt_files: List[str], output_path: str) -> str:
                 new_item = pysrt.SubRipItem()
                 new_item.index = index
                 
+                # 将SubRipTime转换为timedelta
+                start_timedelta = timedelta(
+                    hours=item.start.hours,
+                    minutes=item.start.minutes,
+                    seconds=item.start.seconds,
+                    milliseconds=item.start.milliseconds
+                )
+                end_timedelta = timedelta(
+                    hours=item.end.hours,
+                    minutes=item.end.minutes,
+                    seconds=item.end.seconds,
+                    milliseconds=item.end.milliseconds
+                )
+                
                 # 计算新的开始和结束时间（加上偏移量）
-                new_start = current_time_offset + item.start.to_timedelta()
-                new_end = current_time_offset + item.end.to_timedelta()
+                new_start = current_time_offset + start_timedelta
+                new_end = current_time_offset + end_timedelta
                 
                 # 将timedelta转换回SubRipTime
                 total_seconds_start = int(new_start.total_seconds())
