@@ -214,13 +214,9 @@ def add_background_music(video_clip: VideoClip) -> VideoClip:
         
         # 调整BGM音量为原声的10%
         bgm_clip = bgm_clip.with_volume_scaled(0.1)
-        
-        # 循环BGM以匹配视频长度
-        if bgm_clip.duration < video_clip.duration:
-            bgm_clip = bgm_clip.with_effects([vfx.Loop()]).with_duration(video_clip.duration)
-        else:
-            bgm_clip = bgm_clip.subclipped(0, video_clip.duration)
-        
+ 
+        bgm_clip = bgm_clip.with_effects([vfx.Loop()]).with_duration(video_clip.duration)
+       
         # 混合音频
         original_audio = video_clip.audio
         if original_audio:
