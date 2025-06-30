@@ -89,6 +89,7 @@ def batch_generate_images(scenes_scripts: List[Dict[str, Any]], images_dir: str 
     success_count = 0
     
     for scene_data in scenes_scripts:
+        print(f"生成场景图片: {scene_data['scene_id']}")
         success = generate_scene_image(scene_data, images_dir)
         results.append(success)
         if success:

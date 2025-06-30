@@ -27,7 +27,7 @@ async def main():
 
     # 配置生成参数
     novel_file_path = "assets/novel/index.txt"  # 设置为你的小说文件路径
-    chunk_size = 500      # 每次读取字符数
+    chunk_size = 1000      # 每次读取字符数
     overlap_sentences = 1 # 重叠句子数
 
     print("🎯 生成设置:")

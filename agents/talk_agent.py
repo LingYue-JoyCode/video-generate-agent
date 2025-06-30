@@ -15,11 +15,6 @@ from utils.tts import (
 @dataclass
 class TalkAgentDeps:
     scene_id: int = 1  # 场景ID
-    sentences: Optional[List[str]] = None  # 预分割的句子数组
-    
-    def __post_init__(self):
-        if self.sentences is None:
-            self.sentences = []
 
 
 @dataclass
@@ -37,25 +32,12 @@ talk_agent = Agent(
 
 @talk_agent.instructions
 def analyze_voice_assignment(ctx: RunContext[TalkAgentDeps]) -> str:
-    """为已经切分好的句子分配音色"""
-    scene_id = ctx.deps.scene_id
-    sentences = ctx.deps.sentences
-    
-    if not sentences:
-        return f"""
-你是一位专业的语音分析师，负责为场景 {scene_id} 的脚本生成语音和字幕。
+    """为已经切分好的句子分配音色"""    
+    return """
+请你按照以下的流程进行工作。
 
-工作流程：
-1. 调用 parse_script_sentences 工具读取并切分场景脚本
-2. 为每个句子分配合适的音色类型
-3. 调用 generate_audio_and_srt 工具生成音频和字幕文件
-"""
-    
-    return f"""
-你是一位专业的语音分析师，负责为场景 {scene_id} 已切分的 {len(sentences)} 个句子分配音色。
-
-句子列表：
-{chr(10).join([f"{i+1}. {sentence}" for i, sentence in enumerate(sentences)])}
+1. 调用 parse_script_sentences 工具
+2. 根据工具返回的数组，遍历句子数组，为每个句子分配音色
 
 音色分配规则：
 - **male**: 男性角色对话、男性内心独白、以男性视角的内容

@@ -3,10 +3,12 @@ from pydantic_ai import Agent, RunContext
 from utils.llm import chat_model
 from utils.mcp import filesystem_mcp
 from utils.video import generate_video
-from .novel_agent import novel_agent, NovelAgentDeps
+# from .novel_agent import novel_agent, NovelAgentDeps
+from utils.novel import read_novel_content
 from .scene_agent import scene_agent, SceneAgentDeps
 import asyncio
 import os
+from pathlib import Path
 
 
 @dataclass
@@ -54,13 +56,23 @@ async def generate_content(ctx: RunContext[MainAgentDeps]) -> str:
     if not os.path.exists(ctx.deps.novel_file_path):
         return f"小说源文件不存在: {ctx.deps.novel_file_path}"
         
-    deps = NovelAgentDeps(
-        novel_file_path=ctx.deps.novel_file_path,
-        chunk_size=ctx.deps.chunk_size,
-    )
+    novel_file_path = ctx.deps.novel_file_path
+    chunk_size = ctx.deps.chunk_size
     
-    result = await novel_agent.run("请读取小说源文件并生成内容", deps=deps)
-    return f"文本内容已生成: {result.output}"
+    # 使用utils中的读取函数
+    result = read_novel_content(novel_file_path, chunk_size)
+    
+    # 确保输出目录存在并写入内容
+    output_dir = Path('output')
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    if result:
+        with open(output_dir / 'content.txt', 'w', encoding='utf-8') as f:
+            f.write(result + '\n')
+    
+        return f"文本内容已生成"
+    else:
+        return "未读取到内容，无法生成内容。"
 
 
 @main_agent.tool
