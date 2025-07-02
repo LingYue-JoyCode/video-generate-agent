@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "charset-normalizer>=3.4.2",
+    "deepspeed>=0.17.1",
     "dotenv>=0.9.9",
     "edge-tts>=7.0.2",
     "faster-whisper>=1.1.1",
