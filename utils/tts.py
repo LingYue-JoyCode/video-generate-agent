@@ -44,7 +44,7 @@ def generate_audio(text: str, audio_path: str, srt_path: Optional[str] = None, v
     if IndexTTS is None:
         raise ImportError("IndexTTS 模块未安装，无法生成音频")
         
-    tts = IndexTTS(model_dir="index-tts/checkpoints", cfg_path="index-tts/checkpoints/config.yaml")
+    tts = IndexTTS(model_dir="index-tts/checkpoints", cfg_path="index-tts/checkpoints/config.yaml", device="cuda")
     tts.infer(voice, text, audio_path)
     
     print(f"✅ 音频已生成 ({voice_type} 音色): {audio_path}")
