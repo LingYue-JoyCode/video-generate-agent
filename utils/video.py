@@ -6,6 +6,7 @@ from moviepy import (
     ImageClip,
     concatenate_videoclips,
     vfx,
+    afx
 )
 from moviepy.video.VideoClip import VideoClip
 import os
@@ -213,10 +214,8 @@ def add_background_music(video_clip: VideoClip) -> VideoClip:
         bgm_clip = AudioFileClip(os.path.join(bgm_path, selected_bgm))
         
         # 调整BGM音量为原声的10%
-        bgm_clip = bgm_clip.with_volume_scaled(0.1)
- 
-        bgm_clip = bgm_clip.with_effects([vfx.Loop()]).with_duration(video_clip.duration)
-       
+        bgm_clip = bgm_clip.with_volume_scaled(0.1).with_effects([afx.AudioLoop(duration=video_clip.duration)])
+
         # 混合音频
         original_audio = video_clip.audio
         if original_audio:
