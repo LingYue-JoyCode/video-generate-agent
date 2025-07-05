@@ -1,7 +1,7 @@
 {
   "3": {
     "inputs": {
-      "seed": 963504026888426,
+      "seed": 823656836716786,
       "steps": 30,
       "cfg": 7,
       "sampler_name": "dpmpp_2m",
@@ -31,7 +31,7 @@
   },
   "4": {
     "inputs": {
-      "ckpt_name": "waiNSFWIllustrious_v140.safetensors"
+      "ckpt_name": "waiNSFWIllustrious_v140.safetensors.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
@@ -110,36 +110,17 @@
       "title": "加载LoRA"
     }
   },
-  "31": {
-    "inputs": {
-      "lora_name": "Takarada_Rikka_Illustrious.safetensors",
-      "strength_model": 1.0000000000000002,
-      "strength_clip": 1.0000000000000002,
-      "model": [
-        "13",
-        0
-      ],
-      "clip": [
-        "13",
-        1
-      ]
-    },
-    "class_type": "LoraLoader",
-    "_meta": {
-      "title": "加载LoRA"
-    }
-  },
   "32": {
     "inputs": {
       "lora_name": "TrendCraft_The_Peoples_Style_Detailer-v2.4I-5_18_2025-Illustrious.safetensors",
       "strength_model": 0.5000000000000001,
       "strength_clip": 0.5000000000000001,
       "model": [
-        "31",
+        "13",
         0
       ],
       "clip": [
-        "31",
+        "13",
         1
       ]
     },
@@ -151,8 +132,8 @@
   "33": {
     "inputs": {
       "lora_name": "noobai_ep11_stabilizer_v0.205_fp16.safetensors",
-      "strength_model": 1,
-      "strength_clip": 1,
+      "strength_model": 1.0000000000000002,
+      "strength_clip": 1.0000000000000002,
       "model": [
         "32",
         0

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "charset-normalizer>=3.4.2",
+    "deepspeed>=0.17.1",
     "dotenv>=0.9.9",
     "edge-tts>=7.0.2",
     "faster-whisper>=1.1.1",
@@ -20,7 +21,6 @@ dependencies = [
     "pydub>=0.25.1",
     "pynini",
     "pysrt>=1.1.2",
-    "pytorch-triton-rocm",
     "requests>=2.32.4",
     "torch",
     "torchaudio",
@@ -34,7 +34,3 @@ default = true
 
 [tool.uv.sources]
 indextts = { path = "index-tts" }
-pytorch-triton-rocm = { path = "../../.cache/cuda/pytorch_triton_rocm-3.2.0+rocm6.4.1.git6da9e660-cp312-cp312-linux_x86_64.whl" }
-torch = { path = "../../.cache/cuda/torch-2.6.0+rocm6.4.1.git1ded221d-cp312-cp312-linux_x86_64.whl" }
-torchaudio = { path = "../../.cache/cuda/torchaudio-2.6.0+rocm6.4.1.gitd8831425-cp312-cp312-linux_x86_64.whl" }
-torchvision = { path = "../../.cache/cuda/torchvision-0.21.0+rocm6.4.1.git4040d51f-cp312-cp312-linux_x86_64.whl" }

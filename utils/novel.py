@@ -3,10 +3,17 @@
 提供文件读取和分句功能
 """
 
+from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
+import re
 import chardet
+
+@dataclass
+class NovelChunk:
+    content: str
+    continue_read: bool
 
 
 def detect_encoding(file_path: str) -> str:
@@ -33,29 +40,62 @@ def split_sentences(text: str) -> list:
     if not text:
         return []
     
+    import re
     # 按段落分割
     paragraphs = text.split("\n")
     sentences = []
-    
+    pattern = re.compile(r'([。！？!?])')
+    quote_pattern = re.compile(r'"[^"]+"|“[^”]+”')
+
     for paragraph in paragraphs:
         paragraph = paragraph.strip()
         if not paragraph:
             continue
-            
-        # 按句号分割
-        parts = paragraph.replace("。", "。\n").replace("！", "！\n").replace("？", "？\n").split("\n")
+
+        # 先提取引号内的内容
+        quotes = []
+        def quote_replacer(match):
+            quotes.append(match.group())
+            return f'[[QUOTE_{len(quotes)-1}]]'
+        temp = quote_pattern.sub(quote_replacer, paragraph)
+
+        # 按标点分割
+        parts = []
+        start = 0
+        for m in pattern.finditer(temp):
+            end = m.end()
+            part = temp[start:end].strip()
+            if part:
+                parts.append(part)
+            start = end
+        if start < len(temp):
+            last = temp[start:].strip()
+            if last:
+                parts.append(last)
+
+        # 恢复引号内容并按长度过滤
         for part in parts:
-            part = part.strip()
-            if part and len(part) > 3:
+            # 恢复引号
+            def restore_quote(m):
+                idx = int(m.group(1))
+                return quotes[idx] if idx < len(quotes) else m.group(0)
+            part = re.sub(r'\[\[QUOTE_(\d+)\]\]', restore_quote, part)
+            # 如果是完整引号句子，直接加入
+            if quote_pattern.fullmatch(part):
                 sentences.append(part)
-    
+            elif part and len(part) > 3:
+                sentences.append(part)
+
     return sentences
 
 
-def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> str:
+def read_novel_content(
+    novel_file_path: str,
+    chunk_size: int = 500,
+    chapter_regex: str = r"第[一二三四五六七八九十百千0-9]+章"
+) -> NovelChunk:
     """
-    读取小说内容
-    返回: {"content": str, "finished": bool}
+    读取小说内容，返回内容和是否需要继续读取
     """
     if not Path(novel_file_path).exists():
         raise FileNotFoundError(f"小说文件不存在: {novel_file_path}")
@@ -84,12 +124,22 @@ def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> str:
             # 使用字符偏移量，先读取到指定位置
             if offset > 0:
                 f.read(offset)
-            raw_text = f.read(chunk_size * 2)
+            raw_text = f.read(chunk_size)
     except Exception:
         raise RuntimeError("无法读取文件")
     
     if not raw_text:
-        return ""
+        return NovelChunk(content="", continue_read=False)
+
+    # 如果读取到的内容包含章节标题，则在章节前截断
+    chapter_match = re.search(chapter_regex, raw_text)
+    if chapter_match and chapter_match.start() > 0:
+        raw_text = raw_text[:chapter_match.start()]
+        if not raw_text:
+            return NovelChunk(content="", continue_read=False)
+        continue_read = False
+    else:
+        continue_read = True
     
     # 分句处理
     sentences = split_sentences(raw_text)
@@ -113,5 +163,5 @@ def read_novel_content(novel_file_path: str, chunk_size: int = 500) -> str:
             json.dump({"offset": new_offset}, f)
     except Exception:
         pass
-    
-    return selected_text
+
+    return NovelChunk(content=selected_text, continue_read=continue_read)
