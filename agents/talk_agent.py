@@ -68,6 +68,10 @@ def generate_audio_and_srt(ctx: RunContext[TalkAgentDeps], segments: List[TalkAg
     """为分析后的句子生成音频和字幕文件"""
     scene_id = ctx.deps.scene_id
 
+    # write segments to cache
+    with open(f"output/segments_scene_{scene_id}.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join([f"{seg.text.strip()} [{seg.voice_type}]" for seg in segments]))
+
     # 验证数据
     valid_segments = []
     for seg in segments:

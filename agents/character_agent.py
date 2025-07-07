@@ -27,6 +27,8 @@ Prompt writing guidelines:
 2. Use phrases - Use concise phrases instead of full sentences, separated by English commas for easy management and weight adjustment.
 3. Weight management - The importance of each phrase is determined by its position in the prompt; phrases at the beginning have higher weight and are more likely to appear in the generated image.
 4. Weight expression - You can explicitly set weights using parentheses, e.g., (phrase:1.5) means the phrase has 1.5x normal weight. Typical weights range from 0.5 to 1.5.
+5. For young female characters, always include: alisa mikhailovna kujou (roshidere)
+6. For young male characters, always include: masachika kuze, short hair
 
 Each character's prompt must include:
 1. Gender: Use one of "a man", "a woman", "a boy", "a girl"
@@ -36,10 +38,18 @@ Each character's prompt must include:
 5. Describe each character as detailed as possible in English, including all visible features, accessories, and any unique traits.
 
 Example output:
-<output>
-张三(原文角色，不要翻译为英文): a man, 30s, short hair, black hair, brown eyes, athletic build, wearing a suit, confident expression
-翠花（原文角色，不要翻译为英文）: a girl, 20s, long white hair, black eyes, slender build, floral dress, gentle smile
-</output>
+```json
+[
+    {{
+    "name": "张三", (original character name, do not translate to English)
+    "character_setting": "a man, 30s, masachika kuze, short hair, brown hair, hair between eyes, brown eyes, short hair, black hair, brown eyes, athletic build, wearing a suit, confident expression"
+    }},
+    {{
+    "name": "翠花", (original character name, do not translate to English)
+    "character_setting": "a girl, 20s, alisa mikhailovna kujou (roshidere), long white hair, black eyes, slender build, floral dress, gentle smile"
+    }}
+]
+```
 
 Please generate detailed SD prompts for the main characters based on the novel excerpt above.
 """
