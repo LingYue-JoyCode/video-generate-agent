@@ -2,7 +2,3 @@
 	path = index-tts
 	url = https://github.com/index-tts/index-tts.git
 	branch = indextts_v2
-[submodule "ComfyUI"]
-	path = ComfyUI
-	url = https://github.com/comfyanonymous/ComfyUI.git
-	branch = master
