@@ -32,11 +32,10 @@ Prompt Writing Guidelines:
 4. You may explicitly set weights using parentheses, e.g., (phrase:1.5). Typical weights range from 0.5 to 1.5.
 
 Notes:
-1. 从Character Settings中选择一个角色，并将其描述融入到提示中，不要对人设进行修改。
-2. 在任务设定后加入这个角色的动作和神态的描述，例如“坐在椅子上”。
-3. Include a description of the character's action, e.g., "sitting on a chair".
-4. Include a description of the scene, e.g., "school, classroom".
-5. Make the prompt as detailed and vivid as possible, focusing on visual elements.
+1. Select one character from the Character Settings, use their description as-is, and incorporate it into the prompt without modification.
+2. After the task description, add a description of the character's action and expression, e.g., "sitting on a chair".
+3. Include a description of the scene, e.g., "school, classroom".
+4. Make the prompt as detailed and vivid as possible, focusing on visual elements.
 
 example:
 <PUT THE CHARACTER SETTINGS HERE>, angry, sitting on a chair, school, classroom, detailed background, high resolution
