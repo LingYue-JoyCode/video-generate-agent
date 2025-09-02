@@ -1,14 +1,14 @@
 {
   "3": {
     "inputs": {
-      "seed": 398474398385634,
+      "seed": 749425545001108,
       "steps": 30,
-      "cfg": 7,
+      "cfg": 8,
       "sampler_name": "dpmpp_3m_sde_gpu",
       "scheduler": "karras",
       "denoise": 1,
       "model": [
-        "32",
+        "33",
         0
       ],
       "positive": [
@@ -51,9 +51,9 @@
   },
   "6": {
     "inputs": {
-      "text": "1girl,looking at viewer,facing viewer, front viewer,  <lora:alisa_mikhailovna_kujou_roshidere_s1-ixl-anime-soralz:1> alisa mikhailovna kujou (roshidere),long hair, silver hair,ahoge,crossed bangs,hair ribbon,red ribbon,sidelocks,blue eye,large breasts,school uniform, grey jacket, open jacket, long sleeves, red bowtie, white shirt, collared shirt, buttons, black vest, pleated skirt, white thighhighs, <lora:incoming-headpat-illustriousxl-lora-nochekaiser:1>  incoming headpat, headpat, pov, outstretched arm, reaching, reaching towards viewer, looking at viewer, breasts,digital illustration,1girl, masterpiece, best quality,highres",
+      "text": "embedding:lazypos,a man, 20s, short black hair, dark brown eyes, fair skin, slender build, casual wear, programmer, serious expression, masachika kuze, short hair, standing in a futuristic city, 2045, neon lights, advanced technology, AI assistants, bustling streets, hidden secrets, detailed background, high resolution, cyberpunk atmosphere, glowing holograms, futuristic architecture, dark and moody lighting, urban environment, modern and sleek design",
       "clip": [
-        "32",
+        "33",
         1
       ]
     },
@@ -64,7 +64,7 @@
   },
   "7": {
     "inputs": {
-      "text": "lazyneg, blurry, lowres, worst quality, low quality, bad anatomy, bad hands, multiple views, jpeg artifacts, signature, watermark, text, logo, artist name,simple background, white background, bad quality, worst quality, disfigured, missing limbs, text,bad quality,sketch,(extra fingers), (censor)Z",
+      "text": "lowres, worst quality, low quality, bad anatomy, bad hands, multiple views, jpeg artifacts, signature, watermark, text, logo, artist name,simple background, white background, bad quality, worst quality, disfigured, missing limbs, text,bad quality,sketch,(extra fingers), (censor),embedding:lazyneg, ",
       "clip": [
         "4",
         1
@@ -91,55 +91,17 @@
       "title": "VAE解码"
     }
   },
-  "13": {
-    "inputs": {
-      "lora_name": "Dot_Comics-000018.safetensors",
-      "strength_model": 0.5000000000000001,
-      "strength_clip": 0.5000000000000001,
-      "model": [
-        "4",
-        0
-      ],
-      "clip": [
-        "4",
-        1
-      ]
-    },
-    "class_type": "LoraLoader",
-    "_meta": {
-      "title": "加载LoRA"
-    }
-  },
-  "31": {
-    "inputs": {
-      "lora_name": "alisa_mikhailovna_kujou-roshidere_s1-ixl-anime-soralz.safetensors",
-      "strength_model": 1.0000000000000002,
-      "strength_clip": 1.0000000000000002,
-      "model": [
-        "13",
-        0
-      ],
-      "clip": [
-        "13",
-        1
-      ]
-    },
-    "class_type": "LoraLoader",
-    "_meta": {
-      "title": "加载LoRA"
-    }
-  },
-  "32": {
+  "33": {
     "inputs": {
       "lora_name": "masachika_kuze_anime-soralz.safetensors",
-      "strength_model": 1.0000000000000002,
-      "strength_clip": 1.0000000000000002,
+      "strength_model": 1,
+      "strength_clip": 1,
       "model": [
-        "31",
+        "4",
         0
       ],
       "clip": [
-        "31",
+        "4",
         1
       ]
     },

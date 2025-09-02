@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 from pydantic_ai import Agent, RunContext
 from utils.llm import chat_model
-from utils.comfyui import generate_image
 
 
 @dataclass
 class ImageAgentDeps:
-    script: str = ""
+    script: str
     character_settings: str = ""
-    scene_id: int = 0
 
 
 image_agent = Agent(model=chat_model, deps_type=ImageAgentDeps, output_type=str)
@@ -41,18 +39,8 @@ example:
 <PUT THE CHARACTER SETTINGS HERE>, angry, sitting on a chair, school, classroom, detailed background, high resolution
 
 After generating the prompt, call the generate_image_by_comfyui tool to generate the corresponding image.
+
+Your answer should **only** include the generated image prompt.
 """
 
-@image_agent.tool
-def generate_image_by_comfyui(ctx: RunContext[ImageAgentDeps], sd_prompt: str) -> str:
-    """生成分镜脚本和对应的图片"""
-    scene_id = ctx.deps.scene_id
 
-    # cache sd_prompt
-    with open(f"output/sd_prompt_scene_{scene_id}.txt", "w", encoding="utf-8") as f:
-        f.write(sd_prompt)
-
-    # Call the image generation API or function here
-    generate_image(prompt_text=sd_prompt, save_path=f"output/images/scene_{scene_id}.png")
-
-    return "success"

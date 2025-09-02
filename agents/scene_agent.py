@@ -1,67 +1,71 @@
-from dataclasses import dataclass
+import json
 from pydantic_ai import Agent, RunContext
 from agents.image_agent import ImageAgentDeps, image_agent
-from agents.character_agent import CharacterAgentDeps, character_agent
+from utils.comfyui import generate_image
 from utils.llm import chat_model
-from agents.talk_agent import talk_agent, TalkAgentDeps
 
-@dataclass
-class SceneAgentDeps:
-    novel_content: str = ""
+scene_agent = Agent(model=chat_model, output_type=list[str])
 
-scene_agent = Agent(
-    model=chat_model,
-    deps_type=SceneAgentDeps,
-    output_type=list[str]
-)
 
 @scene_agent.instructions
-def generate_scenes_and_images(ctx: RunContext[SceneAgentDeps]) -> str:
+def generate_scenes_and_images(ctx: RunContext) -> str:
     """生成分镜脚本和对应的图片"""
 
-    novel_content = ctx.deps.novel_content
+    with open("output/novel_content.txt", "r", encoding="utf-8") as f:
+        novel_content = f.read()
 
     return f"""
-你是一位专业的分镜师，负责将小说内容拆分为合适的视频分镜。
+你是一位专业且严谨的分镜师，负责将小说内容拆分为适合拍摄的视频分镜。下面给出小说原文，请基于原文严格拆分分镜片段，输出格式和约束都必须遵守。
 
-以下是小说的原文：
+小说原文如下：
 {novel_content}
 
-请根据小说的原文进行分镜头的拆分。
+请严格遵守以下规则并仅输出最终结果（不要任何解释或额外文本）：
 
-你需要注意：
-1. 你只需要根据小说的原文内容做分块，因此，每个分块的内容拼接在一起必须是小说的原文，不要做总结，不要做改编。
-2. 分块的顺序必须与小说的原文顺序一致，不得随意调整。
-
-在完成原文拆分后，你需要调用generate_image_audio工具。
+1) 输出格式：直接返回一个合法的 JSON 数组，数组元素为字符串。例如：["第一段原文...", "第二段原文..."]
+2) 数量限制：分镜数量不超过 10 个。
+3) 原文一致性：每个分镜必须是小说原文中的连续片段（不可改写、不可概括、不可补充），字符必须与原文完全一致（保留标点与换行）。
+4) 顺序与重叠：分镜顺序必须与原文顺序一致，片段之间不得重叠；可以不覆盖全书，但不得改变原文顺序。
+5) 长度建议：建议每段控制在约 50–300 字之间（根据情节密度可适当调整），但不要人为拆分导致句义中断。
+6) 清理细节：每个数组元素应去除首尾多余空白，但内部应保留原文换行与空格。
+7) 严格输出：不要包含解释、标题、编号、注释或多余字符；不要使用 Markdown 或代码块包装。
 """
 
+
 @scene_agent.tool
-async def generate_image_audio(ctx: RunContext[SceneAgentDeps], scripts: list[str]) -> None:
-    """生成场景音频"""
-    novel_content = ctx.deps.novel_content
-    # write novel content to cache
-    with open("output/novel_content.txt", "w", encoding="utf-8") as f:
-        f.write(novel_content)
+async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
+    with open("output/character_settings.json", "r", encoding="utf-8") as f:
+        character_settings = f.read()
 
-    # 生成人物设定
-    agent_res = await character_agent.run(
-        user_prompt="Please generate character settings.",
-        deps=CharacterAgentDeps(novel_content=novel_content)
-    )
-
-    character_settings = agent_res.output
-
-    # write cache
-    with open("output/character_settings.txt", "w", encoding="utf-8") as f:
-        f.write(character_settings)
-    
-    for idx, script in enumerate(scripts):
-        await image_agent.run(
-            "请生成分镜图像", deps=ImageAgentDeps(script=script, character_settings=character_settings, scene_id=idx)
+    scene = []
+    for item in scripts:
+        result = await image_agent.run(
+            "请生成分镜图像",
+            deps=ImageAgentDeps(script=item, character_settings=character_settings),
         )
-        await talk_agent.run(
-            "请生成场景音频和字幕", deps=TalkAgentDeps(novel_content=novel_content, script=script, scene_id=idx)
+        sd_prompt = result.output
+        scene.append({"script": item, "sd_prompt": sd_prompt})
+
+    with open("output/scenes.json", "w", encoding="utf-8") as f:
+        json.dump(scene, f, ensure_ascii=False, indent=4)
+
+    for idx, item in enumerate(scene):
+        generate_image(
+            prompt_text=item["sd_prompt"],
+            save_path=f"output/images/scene_{idx}.png",
         )
 
     print("场景音频和图像生成完成")
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    async def main():
+        async with scene_agent:
+            res = await scene_agent.run(
+                user_prompt="请帮我生成合适的分镜",
+            )
+        print(res.output)
+
+    asyncio.run(main())
