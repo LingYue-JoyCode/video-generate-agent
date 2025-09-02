@@ -1215,7 +1215,7 @@ wheels = [
 
 [[package]]
 name = "indextts"
-version = "0.1.4"
+version = "0.1.1"
 source = { directory = "index-tts" }
 dependencies = [
     { name = "accelerate" },

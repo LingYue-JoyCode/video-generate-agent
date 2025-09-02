@@ -1,19 +1,20 @@
 import os
 import pysrt
+import subprocess
 from typing import Optional, List, Tuple
 from datetime import timedelta
 from pydub import AudioSegment
 
 try:
-    from indextts.infer import IndexTTS
-except ImportError:
-    IndexTTS = None
-    print("警告: IndexTTS 模块未安装，音频生成功能将不可用")
+    # 检查edge-tts是否可用
+    subprocess.run(["edge-tts", "--help"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+except (FileNotFoundError, subprocess.SubprocessError):
+    print("警告: edge-tts 命令未找到，音频生成功能将不可用")
 
 
 def generate_audio(text: str, audio_path: str, srt_path: Optional[str] = None, voice_type: str = "narrator"):
     """
-    使用IndexTTS生成音频
+    使用edge-tts生成音频
     
     Args:
         text: 要转换为语音的文本
@@ -25,27 +26,38 @@ def generate_audio(text: str, audio_path: str, srt_path: Optional[str] = None, v
     if os.path.dirname(audio_path):
         os.makedirs(os.path.dirname(audio_path), exist_ok=True)
     
-    # 根据音色类型选择对应的音色文件
+    # 如果有字幕路径，确保该目录存在
+    if srt_path and os.path.dirname(srt_path):
+        os.makedirs(os.path.dirname(srt_path), exist_ok=True)
+    
+    # 根据音色类型选择对应的edge-tts音色
     voice_map = {
-        "male": "assets/voice/male.wav",
-        "female": "assets/voice/female.wav", 
-        "narrator": "assets/voice/narrator.wav"
+        "male": "zh-CN-YunxiNeural",
+        "female": "zh-CN-XiaoxiaoNeural", 
+        "narrator": "zh-CN-YunyangNeural"
     }
     
     # 如果指定的音色类型不存在，使用默认音色
-    voice = voice_map.get(voice_type, "assets/voice/zh.wav")
+    voice = voice_map.get(voice_type, "zh-CN-YunyangNeural")
     
-    # 如果音色文件不存在，使用默认音色
-    if not os.path.exists(voice):
-        print(f"警告：音色文件 {voice} 不存在，使用默认音色")
-        voice = "assets/voice/zh.wav"
+    # 使用subprocess调用edge-tts命令行工具
+    import subprocess
     
-    # 使用IndexTTS生成音频
-    if IndexTTS is None:
-        raise ImportError("IndexTTS 模块未安装，无法生成音频")
+    try:
+        cmd = ["edge-tts", "--text", text, "--voice", voice, "--write-media", audio_path]
         
-    tts = IndexTTS(model_dir="index-tts/checkpoints", cfg_path="index-tts/checkpoints/config.yaml", device="cuda")
-    tts.infer(voice, text, audio_path)
+        # 如果需要生成字幕
+        if srt_path:
+            cmd.extend(["--write-subtitles", srt_path])
+        
+        # 执行命令
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            raise RuntimeError(f"edge-tts执行失败: {result.stderr}")
+            
+    except Exception as e:
+        raise RuntimeError(f"edge-tts 生成音频失败: {e}")
     
     print(f"✅ 音频已生成 ({voice_type} 音色): {audio_path}")
 
