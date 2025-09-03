@@ -1,7 +1,9 @@
 import json
+import os
 from pydantic_ai import Agent, RunContext
 from agents.image_agent import ImageAgentDeps, image_agent
 from utils.comfyui import generate_image
+from utils.edge_tts import generate_audio_for_script
 from utils.llm import chat_model
 
 scene_agent = Agent(model=chat_model, output_type=list[str])
@@ -50,12 +52,23 @@ async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
         json.dump(scene, f, ensure_ascii=False, indent=4)
 
     for idx, item in enumerate(scene):
-        generate_image(
-            prompt_text=item["sd_prompt"],
-            save_path=f"output/images/scene_{idx}.png",
-        )
+        # 1) 生成分镜图像
+        # generate_image(
+        #     prompt_text=item["sd_prompt"],
+        #     save_path=f"output/images/scene_{idx}.png",
+        # )
+        # 2) 保存脚本文本
+        script_path = f"output/scripts/scene_{idx}.txt"
+        os.makedirs("output/scripts", exist_ok=True)
+        with open(script_path, "w", encoding="utf-8") as sf:
+            sf.write(item["script"])
+        # 3) 生成音频与字幕
+        audio_path = f"output/audio/scene_{idx}.mp3"
+        srt_path = f"output/subtitles/scene_{idx}.srt"
+        generate_audio_for_script(script_path=script_path, audio_path=audio_path, srt_path=srt_path)
+        
 
-    print("场景音频和图像生成完成")
+    print("场景图像、配音与字幕生成完成")
 
 
 if __name__ == "__main__":
