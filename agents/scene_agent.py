@@ -5,6 +5,8 @@ from agents.image_agent import ImageAgentDeps, image_agent
 from utils.comfyui import generate_image
 from utils.edge_tts import generate_audio_for_script
 from utils.llm import chat_model
+from ag_ui.core import EventType, StateSnapshotEvent
+from utils.config import system_prompt
 
 scene_agent = Agent(model=chat_model, output_type=list[str])
 
@@ -31,11 +33,22 @@ def generate_scenes_and_images(ctx: RunContext) -> str:
 5) 长度建议：建议每段控制在约 50–300 字之间（根据情节密度可适当调整），但不要人为拆分导致句义中断。
 6) 清理细节：每个数组元素应去除首尾多余空白，但内部应保留原文换行与空格。
 7) 严格输出：不要包含解释、标题、编号、注释或多余字符；不要使用 Markdown 或代码块包装。
+
+{system_prompt}
 """
 
 
+@scene_agent.tool_plain
+async def send_current_plan(current_plan: str) -> StateSnapshotEvent:
+    return StateSnapshotEvent(
+        type=EventType.STATE_SNAPSHOT, snapshot={"message": current_plan}
+    )
+
+
 @scene_agent.tool
-async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
+async def generate_image_audio(
+    ctx: RunContext, scripts: list[str]
+) -> StateSnapshotEvent:
     with open("output/character_settings.json", "r", encoding="utf-8") as f:
         character_settings = f.read()
 
@@ -65,9 +78,14 @@ async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
         # 3) 生成音频与字幕
         audio_path = f"output/audio/scene_{idx}.mp3"
         srt_path = f"output/subtitles/scene_{idx}.srt"
-        generate_audio_for_script(script_path=script_path, audio_path=audio_path, srt_path=srt_path)
-        
-    print("场景图像、配音与字幕生成完成")
+        generate_audio_for_script(
+            script_path=script_path, audio_path=audio_path, srt_path=srt_path
+        )
+
+    return StateSnapshotEvent(
+        type=EventType.STATE_SNAPSHOT,
+        snapshot={"message": "场景图像、配音与字幕生成完成"},
+    )
 
 
 if __name__ == "__main__":
