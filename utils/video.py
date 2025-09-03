@@ -10,10 +10,9 @@ from moviepy import (
 )
 from moviepy.video.VideoClip import VideoClip
 import os
-import json
 import random
 from moviepy.video.tools.subtitles import SubtitlesClip
-from typing import cast
+from typing import cast, Optional
 import dotenv
 
 dotenv.load_dotenv()
@@ -21,58 +20,75 @@ dotenv.load_dotenv()
 FONT_PATH = os.getenv("FONT_PATH") or 'assets/font/MapleMono-NF-CN-Regular.ttf'
 
 
+def _find_with_exts(base_dir: str, base_name: str, exts: list[str]) -> Optional[str]:
+    """在 base_dir 下按给定扩展名顺序查找文件，返回首个存在的路径。"""
+    for ext in exts:
+        path = os.path.join(base_dir, f"{base_name}{ext}")
+        if os.path.exists(path):
+            return path
+    return None
+
+
 def generate_video() -> str:
     """
-    根据扁平化的output目录结构生成最终视频
+    根据最新的 output 目录结构（无需 scenes.json）生成最终视频：
+    - 扫描 output/audio 下的 scene_*.{mp3,wav,ogg,m4a}
+    - 匹配 output/images 下对应 scene_*.{png,jpg,jpeg,webp}
+    - 匹配 output/subtitles 下对应 scene_*.srt（可选）
     
     Returns:
         str: 生成结果描述
     """
     try:
-        # 检查必要的目录和文件
-        scenes_file = "output/scenes.json"
+        # 检查必要的目录
         audio_dir = "output/audio"
         image_dir = "output/images"
-        srt_dir = "output/srt"
-        
-        if not os.path.exists(scenes_file):
-            return f"❌ 场景文件不存在: {scenes_file}"
-        
-        # 读取场景数据
-        with open(scenes_file, "r", encoding="utf-8") as f:
-            scenes_data = json.load(f)
-        
-        if not scenes_data:
-            return "❌ 没有找到场景数据"
-        
-        # 按scene_id排序
-        scenes_data.sort(key=lambda x: x.get("scene_id", 0))
-        
-        # 收集所有场景的媒体文件
+        srt_dir = "output/subtitles"
+
+        if not os.path.isdir(audio_dir):
+            return f"❌ 音频目录不存在: {audio_dir}"
+        if not os.path.isdir(image_dir):
+            return f"❌ 图片目录不存在: {image_dir}"
+
+        # 收集所有场景的媒体文件（以音频为基准）
         clips = []
         missing_files = []
-        
-        for scene in scenes_data:
-            scene_id = scene.get("scene_id")
-            if not scene_id:
+
+        # 支持的扩展名
+        audio_exts = [".mp3", ".wav", ".ogg", ".m4a"]
+        image_exts = [".png", ".jpg", ".jpeg", ".webp"]
+
+        # 从音频目录提取 scene_id
+        candidates = []
+        for fname in os.listdir(audio_dir):
+            name_lower = fname.lower()
+            if not any(name_lower.endswith(ext) for ext in audio_exts):
                 continue
-                
-            # 构建文件路径
-            audio_file = os.path.join(audio_dir, f"scene_{scene_id}.wav")
-            image_file = os.path.join(image_dir, f"scene_{scene_id}.png")
-            srt_file = os.path.join(srt_dir, f"scene_{scene_id}.srt")
-            
-            # 检查文件是否存在
-            if not os.path.exists(audio_file):
-                missing_files.append(f"音频: {audio_file}")
+            # 匹配 scene_{id}.ext
+            if name_lower.startswith("scene_"):
+                stem = os.path.splitext(fname)[0]  # scene_{id}
+                parts = stem.split("_")
+                if len(parts) == 2 and parts[1].isdigit():
+                    candidates.append(int(parts[1]))
+
+        if not candidates:
+            return "❌ 未在 output/audio 下找到任何场景音频文件"
+
+        for scene_id in sorted(candidates):
+            base = f"scene_{scene_id}"
+            audio_file = _find_with_exts(audio_dir, base, audio_exts)
+            image_file = _find_with_exts(image_dir, base, image_exts)
+            srt_file = os.path.join(srt_dir, f"{base}.srt") if os.path.isdir(srt_dir) else None
+            if srt_file and not os.path.exists(srt_file):
+                srt_file = None
+
+            if not audio_file:
+                missing_files.append(f"音频缺失: {os.path.join(audio_dir, base)}.*")
                 continue
-            if not os.path.exists(image_file):
-                missing_files.append(f"图片: {image_file}")
+            if not image_file:
+                missing_files.append(f"图片缺失: {os.path.join(image_dir, base)}.*")
                 continue
-            if not os.path.exists(srt_file):
-                missing_files.append(f"字幕: {srt_file}")
-                continue
-            
+
             # 创建视频片段
             try:
                 clip = create_video_clip(audio_file, image_file, srt_file)
@@ -95,14 +111,14 @@ def generate_video() -> str:
         return f"❌ 视频生成失败: {str(e)}"
 
 
-def create_video_clip(audio_file: str, image_file: str, srt_file: str) -> VideoClip:
+def create_video_clip(audio_file: str, image_file: str, srt_file: Optional[str]) -> VideoClip:
     """
     创建单个视频片段
     
     Args:
         audio_file: 音频文件路径
         image_file: 图片文件路径
-        srt_file: 字幕文件路径
+        srt_file: 字幕文件路径（可为 None 表示无字幕）
         
     Returns:
         VideoClip: 视频片段
@@ -112,25 +128,27 @@ def create_video_clip(audio_file: str, image_file: str, srt_file: str) -> VideoC
     
     # 加载图片并设置持续时间
     image_clip = ImageClip(image_file, duration=audio_clip.duration)
-    
-    # 创建字幕
-    srt_clip = SubtitlesClip(
-        subtitles=srt_file,
-        encoding="utf-8",
-        make_textclip=lambda text: TextClip(
-            font=FONT_PATH if os.path.exists(FONT_PATH) else "Arial",
-            text=text,
-            font_size=48,
-            color="white",
-            stroke_color="black",
-            stroke_width=2,
-            vertical_align="center",
-            margin=(10, 10, 10, 48 * 3),
-            method="caption",
-            text_align="center",
-            size=(image_clip.w, None),
-        ),
-    )
+
+    # 创建字幕（可选）
+    srt_clip = None
+    if srt_file:
+        srt_clip = SubtitlesClip(
+            subtitles=srt_file,
+            encoding="utf-8",
+            make_textclip=lambda text: TextClip(
+                font=FONT_PATH if os.path.exists(FONT_PATH) else "Arial",
+                text=text,
+                font_size=48,
+                color="white",
+                stroke_color="black",
+                stroke_width=2,
+                vertical_align="center",
+                margin=(10, 10, 10, 48 * 3),
+                method="caption",
+                text_align="center",
+                size=(image_clip.w, None),
+            ),
+        )
     
     # 应用特效到图片
     image_with_effects = cast(
@@ -142,10 +160,11 @@ def create_video_clip(audio_file: str, image_file: str, srt_file: str) -> VideoC
     )
     
     # 合成视频片段
-    video_clip = CompositeVideoClip([
-        image_with_effects.with_audio(audio_clip),
-        srt_clip.with_position(("center", "bottom")),
-    ])
+    layers = [image_with_effects.with_audio(audio_clip)]
+    if srt_clip is not None:
+        layers.append(srt_clip.with_position(("center", "bottom")))
+
+    video_clip = CompositeVideoClip(layers)
     
     return video_clip
 

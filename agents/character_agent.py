@@ -3,53 +3,45 @@ from pydantic_ai import Agent, RunContext
 from utils.llm import chat_model
 
 @dataclass
-class CharacterAgentDeps:
-    novel_content: str = ""
+class CharacterAgentOutput:
+    name: str
+    character_setting: str
 
-character_agent = Agent(
-    model=chat_model,
-    deps_type=CharacterAgentDeps,
-    output_type=str
-)
+character_agent = Agent(model=chat_model, output_type=list[CharacterAgentOutput])
 
 @character_agent.instructions
-def generate_sd_prompt(ctx: RunContext[CharacterAgentDeps]) -> str:
-    """生成分镜脚本和对应的图片"""
-    novel_content = ctx.deps.novel_content
+def generate_sd_prompt(ctx: RunContext) -> str:
+    """为小说人物生成 Stable Diffusion 角色提示词（中文说明、英文提示词）。"""
+    with open("output/novel_content.txt", "r", encoding="utf-8") as f:
+        novel_content = f.read()
     return f"""
-You are a professional illustrator. Your task is to extract all character profiles from the provided text and generate detailed SD (Stable Diffusion) prompts for each character.
+你是一名专业插画师。请从下方小说内容中抽取所有主要人物，并为每位角色生成用于 Stable Diffusion 的角色提示词（SD prompt）。
 
-Here is the original novel excerpt:
+小说原文片段：
 {novel_content}
 
-Prompt writing guidelines:
-1. Write in English - Prompts must be in English, as the CLIP model is trained on English datasets.
-2. Use phrases - Use concise phrases instead of full sentences, separated by English commas for easy management and weight adjustment.
-3. Weight management - The importance of each phrase is determined by its position in the prompt; phrases at the beginning have higher weight and are more likely to appear in the generated image.
-4. Weight expression - You can explicitly set weights using parentheses, e.g., (phrase:1.5) means the phrase has 1.5x normal weight. Typical weights range from 0.5 to 1.5.
-5. For young female characters, always include: alisa mikhailovna kujou (roshidere)
-6. For young male characters, always include: masachika kuze, short hair
-
-Each character's prompt must include:
-1. Gender: Use one of "a man", "a woman", "a boy", "a girl"
-2. Age group (e.g., 20s, 30s, teenager, child)
-3. Distinctive appearance: e.g., hair color and style, eye color, body type, clothing, accessories, facial expression, and any unique features
-4. Clothing: e.g., casual wear, formal attire, armor, etc.
-5. Describe each character as detailed as possible in English, including all visible features, accessories, and any unique traits.
-
-Example output:
-```json
-[
-    {{
-    "name": "张三", (original character name, do not translate to English)
-    "character_setting": "a man, 30s, masachika kuze, short hair, brown hair, hair between eyes, brown eyes, short hair, black hair, brown eyes, athletic build, wearing a suit, confident expression"
-    }},
-    {{
-    "name": "翠花", (original character name, do not translate to English)
-    "character_setting": "a girl, 20s, alisa mikhailovna kujou (roshidere), long white hair, black eyes, slender build, floral dress, gentle smile"
-    }}
-]
-```
-
-Please generate detailed SD prompts for the main characters based on the novel excerpt above.
+产出要求（请严格遵守）：
+1) 输出格式：仅输出 JSON 数组字符串，不要使用 Markdown 代码块，不要添加说明文字或多余字段。数组中每个元素必须包含字段："name"（中文原名，不要翻译）、"character_setting"（英文短语）。
+2) 语言与形式：character_setting 只能使用英文短语，使用英文逗号分隔，不写完整句子；将重要短语放在前面以增加权重。
+3) 权重表达：允许对关键短语使用括号权重，例如 (phrase:1.2)，常见范围 0.5–1.5。
+4) 必含信息（按优先级从高到低组织）：
+     - 性别标签：从 "a man" / "a woman" / "a boy" / "a girl" 中选择其一，并置于最前。
+     - 年龄段：如 20s, 30s, teenager, child。
+     - 外观细节：发色与发型、瞳色、肤色、脸型、体型、五官特征、表情、显著特征（疤痕、痣、雀斑等）。
+     - 服饰与配件：服装风格（casual wear / formal attire / school uniform / armor / traditional 等）、材质、颜色、饰品、道具。
+     - 其他必要描述：如果文本未明确，给出合理、常见且不与原文冲突的通用描述。
+5) 去重与一致性：同名角色合并为一个条目，并根据文本整合其稳定且显著的形象要素。
 """
+
+# 测试agent
+if __name__ == "__main__":
+    import asyncio
+
+    async def main():
+        async with character_agent:
+            res = await character_agent.run(
+                user_prompt="请按照要求生成角色设定。",
+            )
+        print(res.output)
+
+    asyncio.run(main())
