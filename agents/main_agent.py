@@ -1,8 +1,10 @@
 import json
 from pydantic_ai import Agent, RunContext
 from utils.llm import chat_model
-from character_agent import character_agent
-from novel_agent import novel_agent, NovelAgentDeps
+from .character_agent import character_agent
+from .novel_agent import novel_agent, NovelAgentDeps
+from .scene_agent import scene_agent
+from utils.video import generate_video
 
 main_agent = Agent(
     model=chat_model,
@@ -17,7 +19,8 @@ def main_instructions(ctx: RunContext) -> str:
 你的工作流程如下：
 1. 调用工具创建小说
 2. 调用工具创建人物设定
-3. 调用工具生成短视频
+3. 调用工具生成分镜场景
+4. 调用工具生成最终视频
 """
 
 
@@ -36,7 +39,6 @@ async def novel_creation(ctx: RunContext, baseline: str, word_limit: int = 1000)
 
 @main_agent.tool
 async def generate_character_settings(ctx: RunContext) -> str:
-    print("生成角色设定...")
     result = await character_agent.run(
         user_prompt="请根据要求生成角色设定。",
     )
@@ -53,6 +55,19 @@ async def generate_character_settings(ctx: RunContext) -> str:
     with open("output/character_settings.json", "w", encoding="utf-8") as f:
         json.dump(character_settings, f, ensure_ascii=False, indent=4)
     return "角色设定已生成。"
+
+
+@main_agent.tool_plain
+async def generate_scenes() -> str:
+    result = await scene_agent.run(
+        user_prompt="请根据要求生成场景。",
+    )
+    return "\n".join(result.output)
+
+
+@main_agent.tool_plain
+async def generate_final_video() -> str:
+    return generate_video()
 
 
 # 测试agent
