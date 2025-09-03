@@ -45,10 +45,8 @@ async def send_current_plan(current_plan: str) -> StateSnapshotEvent:
     )
 
 
-@scene_agent.tool
-async def generate_image_audio(
-    ctx: RunContext, scripts: list[str]
-) -> StateSnapshotEvent:
+@scene_agent.tool_plain
+async def generate_image_audio(scripts: list[str]) -> StateSnapshotEvent:
     with open("output/character_settings.json", "r", encoding="utf-8") as f:
         character_settings = f.read()
 
@@ -64,27 +62,9 @@ async def generate_image_audio(
     with open("output/scenes.json", "w", encoding="utf-8") as f:
         json.dump(scene, f, ensure_ascii=False, indent=4)
 
-    for idx, item in enumerate(scene):
-        # 1) 生成分镜图像
-        # generate_image(
-        #     prompt_text=item["sd_prompt"],
-        #     save_path=f"output/images/scene_{idx}.png",
-        # )
-        # 2) 保存脚本文本
-        script_path = f"output/scripts/scene_{idx}.txt"
-        os.makedirs("output/scripts", exist_ok=True)
-        with open(script_path, "w", encoding="utf-8") as sf:
-            sf.write(item["script"])
-        # 3) 生成音频与字幕
-        audio_path = f"output/audio/scene_{idx}.mp3"
-        srt_path = f"output/subtitles/scene_{idx}.srt"
-        generate_audio_for_script(
-            script_path=script_path, audio_path=audio_path, srt_path=srt_path
-        )
-
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "场景图像、配音与字幕生成完成"},
+        snapshot={"message": "分镜生成完成"},
     )
 
 

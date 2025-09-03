@@ -1,5 +1,8 @@
 import json
+import os
 from pydantic_ai import Agent, RunContext
+from utils.comfyui import generate_image
+from utils.edge_tts import generate_audio_for_script
 from utils.llm import chat_model
 from .character_agent import character_agent
 from .novel_agent import novel_agent, NovelAgentDeps
@@ -29,7 +32,9 @@ def main_instructions(ctx: RunContext[StateDeps[AgentState]]) -> str:
 1. 调用工具创建小说
 2. 调用工具创建人物设定
 3. 调用工具生成分镜场景
-4. 调用工具生成最终视频
+4. 调用工具生成图片
+5. 调用工具生成音频和字幕
+6. 调用工具生成最终视频
 
 {system_prompt}
 """
@@ -52,9 +57,9 @@ async def novel_creation(baseline: str, word_limit: int = 1000) -> StateSnapshot
 
 
 @main_agent.tool_plain
-async def send_current_plan(current_plan: str) -> StateSnapshotEvent:
+async def send_current_plan(message: str, detail: str) -> StateSnapshotEvent:
     return StateSnapshotEvent(
-        type=EventType.STATE_SNAPSHOT, snapshot={"message": current_plan}
+        type=EventType.STATE_SNAPSHOT, snapshot={"message": message, "detail": detail}
     )
 
 
@@ -89,6 +94,48 @@ async def generate_scenes() -> StateSnapshotEvent:
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
         snapshot={"message": "场景已创建。"},
+    )
+
+
+@main_agent.tool_plain
+async def generate_images() -> StateSnapshotEvent:
+    with open("output/scenes.json", "r", encoding="utf-8") as f:
+        scene = json.load(f)
+
+    for idx, item in enumerate(scene):
+        # 1) 生成分镜图像
+        generate_image(
+            prompt_text=item["sd_prompt"],
+            save_path=f"output/images/scene_{idx}.png",
+        )
+
+    return StateSnapshotEvent(
+        type=EventType.STATE_SNAPSHOT,
+        snapshot={"message": "分镜图像已生成。"},
+    )
+
+
+@main_agent.tool_plain
+async def generate_audios() -> StateSnapshotEvent:
+    with open("output/scenes.json", "r", encoding="utf-8") as f:
+        scene = json.load(f)
+
+    for idx, item in enumerate(scene):
+        # 2) 保存脚本文本
+        script_path = f"output/scripts/scene_{idx}.txt"
+        os.makedirs("output/scripts", exist_ok=True)
+        with open(script_path, "w", encoding="utf-8") as sf:
+            sf.write(item["script"])
+        # 3) 生成音频与字幕
+        audio_path = f"output/audio/scene_{idx}.mp3"
+        srt_path = f"output/subtitles/scene_{idx}.srt"
+        generate_audio_for_script(
+            script_path=script_path, audio_path=audio_path, srt_path=srt_path
+        )
+
+    return StateSnapshotEvent(
+        type=EventType.STATE_SNAPSHOT,
+        snapshot={"message": "分镜配音已生成。"},
     )
 
 
