@@ -448,6 +448,20 @@ wheels = [
 ]
 
 [[package]]
+name = "fastapi"
+version = "0.116.1"
+source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "starlette" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/78/d7/6c8b3bfe33eeffa208183ec037fee0cce9f7f024089ab1c5d12ef04bd27c/fastapi-0.116.1.tar.gz", hash = "sha256:ed52cbf946abfd70c5a0dccb24673f0670deeb517a88b3544d03c2a6bf283143", size = 296485, upload-time = "2025-07-11T16:22:32.057Z" }
+wheels = [
+    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/e5/47/d63c60f59a59467fda0f93f46335c9d18526d7071f025cb5b89d5353ea42/fastapi-0.116.1-py3-none-any.whl", hash = "sha256:c46ac7c312df840f0c9e220f7964bada936781bc4e2e6eb71f1c4d7553786565", size = 95631, upload-time = "2025-07-11T16:22:30.485Z" },
+]
+
+[[package]]
 name = "fastavro"
 version = "1.11.1"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
@@ -594,20 +608,6 @@ source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
 sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/00/f7/27f15d41f0ed38e8fcc488584b57e902b331da7f7c6dcda53721b15838fc/fsspec-2025.5.1.tar.gz", hash = "sha256:2e55e47a540b91843b755e83ded97c6e897fa0942b11490113f09e9c443c2475", size = 303033, upload-time = "2025-05-24T12:03:23.792Z" }
 wheels = [
     { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/bb/61/78c7b3851add1481b048b5fdc29067397a1784e2910592bc81bb3f608635/fsspec-2025.5.1-py3-none-any.whl", hash = "sha256:24d3a2e663d5fc735ab256263c4075f374a174c3410c0b25e5bd1970bceaa462", size = 199052, upload-time = "2025-05-24T12:03:21.66Z" },
-]
-
-[[package]]
-name = "genai-prices"
-version = "0.0.25"
-source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
-dependencies = [
-    { name = "eval-type-backport", marker = "python_full_version < '3.11'" },
-    { name = "httpx" },
-    { name = "pydantic" },
-]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/02/9e/f292acaf69bd209b354ef835cab4ebe845eced05c4db85e3b31585429806/genai_prices-0.0.25.tar.gz", hash = "sha256:caf5fe2fd2248e87f70b2b44bbf8b3b52871abfc078a5e35372c40aca4cc4450", size = 44693, upload-time = "2025-09-01T17:30:42.185Z" }
-wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/86/12/41fcfba4ae0f6b4805f09d11f0e6d6417df2572cea13208c0f439170ee0c/genai_prices-0.0.25-py3-none-any.whl", hash = "sha256:47b412e6927787caa00717a5d99b2e4c0858bed507bb16473b1bcaff48d5aae9", size = 47002, upload-time = "2025-09-01T17:30:41.012Z" },
 ]
 
 [[package]]
@@ -1886,24 +1886,23 @@ wheels = [
 
 [[package]]
 name = "pydantic-ai"
-version = "0.8.1"
+version = "0.7.0"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
 dependencies = [
     { name = "pydantic-ai-slim", extra = ["ag-ui", "anthropic", "bedrock", "cli", "cohere", "evals", "google", "groq", "huggingface", "mcp", "mistral", "openai", "retries", "temporal", "vertexai"] },
 ]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/56/d7/fcc18ce80008e888404a3615f973aa3f39b98384d61b03621144c9f4c2d4/pydantic_ai-0.8.1.tar.gz", hash = "sha256:05974382082ee4f3706909d06bdfcc5e95f39e29230cc4d00e47429080099844", size = 43772581, upload-time = "2025-08-29T14:46:23.201Z" }
+sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/fc/34/8cb6b35e20a70a9d4c85f2965f327dc5bc6f67670bf5c6acec4d3c0ad473/pydantic_ai-0.7.0.tar.gz", hash = "sha256:77da665f6980336c0c237233ad6ff63a501bf1ec6a6efcbdeb0d9179e2e1bcf4", size = 43765402, upload-time = "2025-08-12T23:18:33.318Z" }
 wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/f9/04/802b8cf834dffcda8baabb3b76c549243694a83346c3f54e47a3a4d519fb/pydantic_ai-0.8.1-py3-none-any.whl", hash = "sha256:5fa923097132aa69b4d6a310b462dc091009c7b87705edf4443d37b887d5ef9a", size = 10188, upload-time = "2025-08-29T14:46:11.137Z" },
+    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/42/a4/e3f695b85d5df0dd7f053c4397f0031e5b3d7c514e799b43bdeb5b562dc7/pydantic_ai-0.7.0-py3-none-any.whl", hash = "sha256:cbed3123d3ea1217580adbfc6f21d06a3c7deb45952a353588cbf7bb7f133ec9", size = 10187, upload-time = "2025-08-12T23:18:23.891Z" },
 ]
 
 [[package]]
 name = "pydantic-ai-slim"
-version = "0.8.1"
+version = "0.7.0"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
 dependencies = [
     { name = "eval-type-backport" },
     { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
-    { name = "genai-prices" },
     { name = "griffe" },
     { name = "httpx" },
     { name = "opentelemetry-api" },
@@ -1911,9 +1910,9 @@ dependencies = [
     { name = "pydantic-graph" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/a2/91/08137459b3745900501b3bd11852ced6c81b7ce6e628696d75b09bb786c5/pydantic_ai_slim-0.8.1.tar.gz", hash = "sha256:12ef3dcbe5e1dad195d5e256746ef960f6e59aeddda1a55bdd553ee375ff53ae", size = 218906, upload-time = "2025-08-29T14:46:27.517Z" }
+sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/4a/b2/294beb3633764b14dae6b774f313872ab5978aafa7c1c94e86d0b5d008e0/pydantic_ai_slim-0.7.0.tar.gz", hash = "sha256:dfac38095f6638167fbae7262029bc8a3afbf116cfbeed32b279a3c9bc7e6de5", size = 209432, upload-time = "2025-08-12T23:18:37.656Z" }
 wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/11/ce/8dbadd04f578d02a9825a46e931005743fe223736296f30b55846c084fab/pydantic_ai_slim-0.8.1-py3-none-any.whl", hash = "sha256:fc7edc141b21fe42bc54a2d92c1127f8a75160c5e57a168dba154d3f4adb963f", size = 297821, upload-time = "2025-08-29T14:46:14.647Z" },
+    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/53/08/8ae1bcb57b552fc31a9c71140e900bf4f4218f109e293ac70f6318d05673/pydantic_ai_slim-0.7.0-py3-none-any.whl", hash = "sha256:ab4cf6c6466d54d5e28c74a0bbbccb7c9a638589c2f6ed54fed3d099cdf4f749", size = 285594, upload-time = "2025-08-12T23:18:26.751Z" },
 ]
 
 [package.optional-dependencies]
@@ -1930,7 +1929,6 @@ bedrock = [
 cli = [
     { name = "argcomplete" },
     { name = "prompt-toolkit" },
-    { name = "pyperclip" },
     { name = "rich" },
 ]
 cohere = [
@@ -2057,7 +2055,7 @@ wheels = [
 
 [[package]]
 name = "pydantic-evals"
-version = "0.8.1"
+version = "0.7.0"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
 dependencies = [
     { name = "anyio" },
@@ -2068,14 +2066,14 @@ dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
 ]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/6c/9d/460a1f2c9f5f263e9d8e9661acbd654ccc81ad3373ea43048d914091a817/pydantic_evals-0.8.1.tar.gz", hash = "sha256:c398a623c31c19ce70e346ad75654fcb1517c3f6a821461f64fe5cbbe0813023", size = 43933, upload-time = "2025-08-29T14:46:28.903Z" }
+sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/ba/7d/1fd13a1876d81d7dc97ddf7780968126c5a4a6512aaae55cab119cb86fb8/pydantic_evals-0.7.0.tar.gz", hash = "sha256:912f995c5b7a105d03b8470e46f49610aebe9372c609458f2179c4262ffb222f", size = 44082, upload-time = "2025-08-12T23:18:38.986Z" }
 wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/6f/f9/1d21c4687167c4fa76fd3b1ed47f9bc2d38fd94cbacd9aa3f19e82e59830/pydantic_evals-0.8.1-py3-none-any.whl", hash = "sha256:6c76333b1d79632f619eb58a24ac656e9f402c47c75ad750ba0230d7f5514344", size = 52602, upload-time = "2025-08-29T14:46:16.602Z" },
+    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/eb/1f/c201483791145aa7315df38422110cffd35b9ed1bf89ca9e99e22fdaebd9/pydantic_evals-0.7.0-py3-none-any.whl", hash = "sha256:13117cc2c3844b0adc1db4cd65e246c11534e230ea7ecb603a650918f9e5f100", size = 52759, upload-time = "2025-08-12T23:18:28.434Z" },
 ]
 
 [[package]]
 name = "pydantic-graph"
-version = "0.8.1"
+version = "0.7.0"
 source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
 dependencies = [
     { name = "httpx" },
@@ -2083,9 +2081,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "typing-inspection" },
 ]
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/bd/97/b35b7cb82d9f1bb6d5c6d21bba54f6196a3a5f593373f3a9c163a3821fd7/pydantic_graph-0.8.1.tar.gz", hash = "sha256:c61675a05c74f661d4ff38d04b74bd652c1e0959467801986f2f85dc7585410d", size = 21675, upload-time = "2025-08-29T14:46:29.839Z" }
+sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/53/0d/424dfd9fb1c04fa201407ab7bfb06d583e9431758bf6a4b89396ac8106e6/pydantic_graph-0.7.0.tar.gz", hash = "sha256:147166ab65c1a7ebc81b836910e6fa73fd9d14ee643b6a90074ea08d2eceb19d", size = 21806, upload-time = "2025-08-12T23:18:39.828Z" }
 wheels = [
-    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/3d/e3/5908643b049bb2384d143885725cbeb0f53707d418357d4d1ac8d2c82629/pydantic_graph-0.8.1-py3-none-any.whl", hash = "sha256:f1dd5db0fe22f4e3323c04c65e2f0013846decc312b3efc3196666764556b765", size = 27239, upload-time = "2025-08-29T14:46:18.317Z" },
+    { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/ef/66/e601a596ae7cc6c33f1a5a43b71305d2e687235b86d97dab1de10e0071d2/pydantic_graph-0.7.0-py3-none-any.whl", hash = "sha256:a2a3ddf2d0d10f6aee501dc48fb40a391624a348fccffbb6b2c97ec10c71991a", size = 27395, upload-time = "2025-08-12T23:18:29.991Z" },
 ]
 
 [[package]]
@@ -2110,12 +2108,6 @@ sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/7c/2d/c3
 wheels = [
     { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293, upload-time = "2025-01-06T17:26:25.553Z" },
 ]
-
-[[package]]
-name = "pyperclip"
-version = "1.9.0"
-source = { registry = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple" }
-sdist = { url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/packages/30/23/2f0a3efc4d6a32f3b63cdff36cd398d9701d26cda58e3ab97ac79fb5e60d/pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310", size = 20961, upload-time = "2024-06-18T20:38:48.401Z" }
 
 [[package]]
 name = "python-dateutil"
@@ -2735,6 +2727,7 @@ dependencies = [
     { name = "deepspeed" },
     { name = "dotenv" },
     { name = "edge-tts" },
+    { name = "fastapi" },
     { name = "httpx", extra = ["socks"] },
     { name = "jieba" },
     { name = "mcp" },
@@ -2742,8 +2735,8 @@ dependencies = [
     { name = "parsel" },
     { name = "pillow" },
     { name = "pydantic-ai" },
-    { name = "pydantic-ai-slim", extra = ["mcp"] },
     { name = "requests" },
+    { name = "uvicorn" },
     { name = "websocket-client" },
 ]
 
@@ -2753,15 +2746,16 @@ requires-dist = [
     { name = "deepspeed", specifier = ">=0.17.1" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "edge-tts", specifier = ">=7.0.2" },
+    { name = "fastapi", specifier = ">=0.116.1" },
     { name = "httpx", extras = ["socks"], specifier = ">=0.28.1" },
     { name = "jieba", specifier = ">=0.42.1" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "moviepy", specifier = ">=2.2.1" },
     { name = "parsel", specifier = ">=1.10.0" },
     { name = "pillow", specifier = ">=11.2.1" },
-    { name = "pydantic-ai", specifier = ">=0.8.1" },
-    { name = "pydantic-ai-slim", extras = ["mcp"], specifier = ">=0.8.1" },
+    { name = "pydantic-ai", specifier = "==0.7.0" },
     { name = "requests", specifier = ">=2.32.4" },
+    { name = "uvicorn", specifier = ">=0.34.3" },
     { name = "websocket-client", specifier = ">=1.8.0" },
 ]
 
