@@ -9,23 +9,16 @@ dependencies = [
     "deepspeed>=0.17.1",
     "dotenv>=0.9.9",
     "edge-tts>=7.0.2",
-    "faster-whisper>=1.1.1",
-    "google-genai>=1.19.0",
+    "fastapi>=0.116.1",
     "httpx[socks]>=0.28.1",
-    "indextts",
     "jieba>=0.42.1",
+    "mcp>=1.13.1",
     "moviepy>=2.2.1",
     "parsel>=1.10.0",
     "pillow>=11.2.1",
-    "pydantic-ai[logfire]>=0.2.16",
-    "pydub>=0.25.1",
-    "pynini",
-    "pysrt>=1.1.2",
-    "pytorch-triton-rocm",
+    "pydantic-ai==0.7.0",
     "requests>=2.32.4",
-    "torch",
-    "torchaudio",
-    "torchvision",
+    "uvicorn>=0.34.3",
     "websocket-client>=1.8.0",
 ]
 
@@ -34,8 +27,4 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple"
 default = true
 
 [tool.uv.sources]
-indextts = { path = "index-tts" }
-pytorch-triton-rocm = { path = "../../.cache/cuda/pytorch_triton_rocm-3.2.0+rocm6.4.1.git6da9e660-cp312-cp312-linux_x86_64.whl" }
-torch = { path = "../../.cache/cuda/torch-2.6.0+rocm6.4.1.git1ded221d-cp312-cp312-linux_x86_64.whl" }
-torchaudio = { path = "../../.cache/cuda/torchaudio-2.6.0+rocm6.4.1.gitd8831425-cp312-cp312-linux_x86_64.whl" }
-torchvision = { path = "../../.cache/cuda/torchvision-0.21.0+rocm6.4.1.git4040d51f-cp312-cp312-linux_x86_64.whl" }
+# indextts = { path = "index-tts" }

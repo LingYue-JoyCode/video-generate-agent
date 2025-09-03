@@ -1,4 +1,5 @@
-[submodule "index-tts"]
-	path = index-tts
-	url = https://github.com/index-tts/index-tts.git
-	branch = main
+# 使用edge-tts替代index-tts
+# [submodule "index-tts"]
+# 	path = index-tts
+# 	url = https://github.com/index-tts/index-tts.git
+# 	branch = indextts_v2
