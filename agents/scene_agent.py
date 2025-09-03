@@ -67,7 +67,6 @@ async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
         srt_path = f"output/subtitles/scene_{idx}.srt"
         generate_audio_for_script(script_path=script_path, audio_path=audio_path, srt_path=srt_path)
         
-
     print("场景图像、配音与字幕生成完成")
 
 
