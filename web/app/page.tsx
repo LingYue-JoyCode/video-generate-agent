@@ -3,7 +3,7 @@ import "@copilotkit/react-ui/styles.css";
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCoAgentStateRender } from "@copilotkit/react-core";
 import React, { useRef, useState, useEffect } from "react";
-import {mockdata} from "./mock";
+import { mockdata } from "./mock";
 
 type AgentState = {
   message: string;
@@ -21,7 +21,6 @@ function flattenFiles(data: any) {
   walk(data);
   return result.sort((a, b) => (a.mtime > b.mtime ? 1 : -1));
 }
-
 
 const RightPanel = ({ data }: { data: any }) => {
   const allFiles = flattenFiles(data);
@@ -156,56 +155,74 @@ export default function App() {
     },
   });
 
-const RightPanel = ({ data }: { data: any }) => {
-  const allFiles = flattenFiles(data);
-  const [visibleCount, setVisibleCount] = useState(1);
+  const RightPanel = ({ data }: { data: any }) => {
+    const allFiles = flattenFiles(data);
+    const [visibleCount, setVisibleCount] = useState(1);
 
-  useEffect(() => {
-    if (visibleCount < allFiles.length) {
-      const timer = setTimeout(() => setVisibleCount(visibleCount + 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [visibleCount, allFiles.length]);
+    useEffect(() => {
+      if (visibleCount < allFiles.length) {
+        const timer = setTimeout(() => setVisibleCount(visibleCount + 1), 1000);
+        return () => clearTimeout(timer);
+      }
+    }, [visibleCount, allFiles.length]);
 
-  return (
-    <div className="w-full px-4 py-6 space-y-4">
-      {allFiles.slice(0, visibleCount).map((file, idx) => (
-        <div
-          key={file.path}
-          className="rounded-lg shadow bg-white p-4 flex items-center gap-4"
-        >
-          {/* 图片 */}
-          {file.ext === ".png" && (
-            <img
-              src={`/mock/${file.path}`}
-              alt={file.name}
-              className="w-32 h-20 object-cover rounded"
-            />
-          )}
-          {/* 音频 */}
-          {file.ext === ".mp3" && (
-            <audio controls src={`/mock/${file.path}`} className="w-48" />
-          )}
-          {/* 视频 */}
-          {file.ext === ".mp4" && (
-            <video
-              controls
-              src={`/mock/${file.path}`}
-              className="w-48 rounded"
-            />
-          )}
-          {/* 文本/脚本/字幕 */}
-          {[".txt", ".srt", ".json"].includes(file.ext) && (
-            <div className="flex-1">
-              <div className="font-semibold text-blue-600">{file.name}</div>
-              <div className="text-xs text-gray-400">{file.ext}</div>
+    return (
+      <div className="w-full px-4 py-6 space-y-4">
+        {allFiles.slice(0, visibleCount).map((file, idx) => (
+          <div
+            key={file.path}
+            className="rounded-lg shadow bg-white p-4 flex items-center gap-4 relative"
+          >
+            {/* 图片 */}
+            {file.ext === ".png" && (
+              <img
+                src={`/mock/${file.path}`}
+                alt={file.name}
+                className="w-32 h-20 object-cover rounded"
+              />
+            )}
+            {/* 音频 */}
+            {file.ext === ".mp3" && (
+              <audio controls src={`/mock/${file.path}`} className="w-48" />
+            )}
+            {/* 视频 */}
+            {file.ext === ".mp4" && (
+              <video
+                controls
+                src={`/mock/${file.path}`}
+                className="w-48 rounded"
+              />
+            )}
+            {/* 文本/脚本/字幕 */}
+            {[".txt", ".srt", ".json"].includes(file.ext) && (
+              <div className="flex-1">
+                <div className="font-semibold text-blue-600">{file.name}</div>
+                <div className="text-xs text-gray-400">{file.ext}</div>
+              </div>
+            )}
+            <div className="absolute top-0.5 right-0.5">
+              <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+                <svg
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  x="0px"
+                  y="0px"
+                  viewBox="0 0 512 512"
+                  enable-background="new 0 0 512 512"
+                  className="h-4 w-4"
+                >
+                  <path
+                    d="M416,199.5h-91.4V64H187.4v135.5H96l160,158.1L416,199.5z M96,402.8V448h320v-45.2H96z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
             </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-};
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="relative w-full h-screen bg-gray-50">
@@ -259,9 +276,9 @@ const RightPanel = ({ data }: { data: any }) => {
               transform: expanded ? "translateX(0)" : "translateX(40px)",
             }}
           >
-            <div className="text-lg font-bold text-blue-600 mb-4">聊天摘要</div>
+            <div className="text-lg font-bold text-blue-600 mb-4"></div>
             <div className="w-full px-4">
-               <RightPanel data={mockdata} />
+              <RightPanel data={mockdata} />
             </div>
           </section>
         </div>
