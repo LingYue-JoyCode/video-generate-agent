@@ -3,4 +3,6 @@ system_prompt = """
 格式：
 message: 我将调用xxxx工具
 detail：对于plan的详细描述，包含当执行的详细信息，以及后续需要执行的操作。
+
+在每次调用工具之前必须先调用send_current_plan工具。
 """

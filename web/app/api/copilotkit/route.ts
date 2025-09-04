@@ -6,6 +6,7 @@ import {
 import { HttpAgent } from "@ag-ui/client";
 import { NextRequest } from "next/server";
 
+
 // 1. You can use any service adapter here for multi-agent support. We use
 //    the empty adapter since we're only using one agent.
 const serviceAdapter = new ExperimentalEmptyAdapter();

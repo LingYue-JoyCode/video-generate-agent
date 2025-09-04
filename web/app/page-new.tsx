@@ -32,9 +32,9 @@ export default function App() {
   // 获取文件树数据
   useEffect(() => {
     fetch("/api/file-tree")
-      .then((res) => res.json())
-      .then((data) => setFileTreeData(data))
-      .catch((err) => {
+      .then(res => res.json())
+      .then(data => setFileTreeData(data))
+      .catch(err => {
         console.error("Failed to load file tree:", err);
         // 使用 mock 数据作为备用
         import("./mock").then(({ mockdata }) => {
@@ -77,7 +77,7 @@ export default function App() {
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-
+    
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
@@ -107,8 +107,8 @@ export default function App() {
         </div>
         <div className="flex-1 overflow-hidden">
           {fileTreeData ? (
-            <FileTree
-              data={fileTreeData}
+            <FileTree 
+              data={fileTreeData} 
               onFileSelect={(file) => setSelectedFile(file)}
             />
           ) : (
@@ -127,8 +127,8 @@ export default function App() {
 
       {/* 中间聊天区域 */}
       <div className="flex-1 flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="h-full w-full">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="h-[80vh] w-full max-w-4xl">
             <CopilotChat className="h-full w-full rounded-xl shadow-lg bg-white border border-gray-200" />
           </div>
         </div>
