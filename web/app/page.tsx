@@ -161,18 +161,18 @@ export default function App() {
         {/* 图片 */}
         {node.ext === ".png" && (
           <img
-            src={`/mock/${node.path}`}
+            src={`/output/${node.path}`}
             alt={node.name}
             className="w-24 h-16 object-cover rounded"
           />
         )}
         {/* 音频 */}
         {node.ext === ".mp3" && (
-          <audio controls src={`/mock/${node.path}`} className="w-40" />
+          <audio controls src={`/output/${node.path}`} className="w-40" />
         )}
         {/* 视频 */}
         {node.ext === ".mp4" && (
-          <video controls src={`/mock/${node.path}`} className="w-40 rounded" />
+          <video controls src={`/output/${node.path}`} className="w-40 rounded" />
         )}
         {/* 文本/脚本/字幕 */}
         {[".txt", ".srt", ".json"].includes(node.ext) && (
