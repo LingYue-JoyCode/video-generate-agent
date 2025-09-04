@@ -52,7 +52,7 @@ async def novel_creation(baseline: str, word_limit: int = 1000) -> StateSnapshot
         f.write(novel_content)
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "小说内容已创建。"},
+        snapshot={"message": "小说内容已创建。", "detail": novel_content},
     )
 
 
@@ -82,18 +82,24 @@ async def generate_character_settings() -> StateSnapshotEvent:
         json.dump(character_settings, f, ensure_ascii=False, indent=4)
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "角色设定已创建。"},
+        snapshot={
+            "message": "角色设定已创建。",
+            "detail": json.dumps(character_settings, ensure_ascii=False, indent=4),
+        },
     )
 
 
 @main_agent.tool_plain
 async def generate_scenes() -> StateSnapshotEvent:
-    await scene_agent.run(
+    scenes = await scene_agent.run(
         user_prompt="请根据要求生成场景。",
     )
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "场景已创建。"},
+        snapshot={
+            "message": "场景已创建。",
+            "detail": json.dumps(scenes, ensure_ascii=False, indent=4),
+        },
     )
 
 
@@ -111,7 +117,7 @@ async def generate_images() -> StateSnapshotEvent:
 
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "分镜图像已生成。"},
+        snapshot={"message": "分镜图像已生成。", "detail": "请查看output/images/目录"},
     )
 
 
@@ -135,7 +141,10 @@ async def generate_audios() -> StateSnapshotEvent:
 
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "分镜配音已生成。"},
+        snapshot={
+            "message": "分镜配音已生成。",
+            "detail": "音频文件已保存至 output/audio/ 目录\n字幕文件已保存至 output/subtitles/ 目录",
+        },
     )
 
 
@@ -144,7 +153,7 @@ async def generate_final_video() -> StateSnapshotEvent:
     generate_video()
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "最终视频已生成。"},
+        snapshot={"message": "最终视频已生成。", "detail": "您的任务已完成。"},
     )
 
 
