@@ -18,6 +18,7 @@ class AgentState(BaseModel):
     """State for the agent."""
 
     message: str = ""
+    detail: str = ""
 
 
 main_agent = Agent(model=chat_model, deps_type=StateDeps[AgentState])
@@ -32,7 +33,7 @@ def main_instructions(ctx: RunContext[StateDeps[AgentState]]) -> str:
 1. 调用工具创建小说
 2. 调用工具创建人物设定
 3. 调用工具生成分镜场景
-4. 调用工具生成图片
+4. 持续调用工具生成图片，直到所有场景的图片都生成完成，顺序执行，在上一个场景的图片生成完成之后再生成当前场景的图片
 5. 调用工具生成音频和字幕
 6. 调用工具生成最终视频
 
@@ -94,30 +95,34 @@ async def generate_scenes() -> StateSnapshotEvent:
     scenes = await scene_agent.run(
         user_prompt="请根据要求生成场景。",
     )
+
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
         snapshot={
-            "message": "场景已创建。",
-            "detail": json.dumps(scenes, ensure_ascii=False, indent=4),
+            "message": f"场景已创建。总共 {len(scenes.output)} 个场景。",
+            "detail": json.dumps(scenes.output, ensure_ascii=False, indent=4),
         },
     )
 
 
 @main_agent.tool_plain
-async def generate_images() -> StateSnapshotEvent:
+async def generate_scene_image(scene_index: int) -> StateSnapshotEvent:
     with open("output/scenes.json", "r", encoding="utf-8") as f:
-        scene = json.load(f)
+        scenes = json.load(f)
 
-    for idx, item in enumerate(scene):
-        # 1) 生成分镜图像
-        generate_image(
-            prompt_text=item["sd_prompt"],
-            save_path=f"output/images/scene_{idx}.png",
-        )
+    scene = scenes[scene_index]
+    # 1) 生成分镜图像
+    generate_image(
+        prompt_text=scene["sd_prompt"],
+        save_path=f"output/images/scene_{scene_index}.png",
+    )
 
     return StateSnapshotEvent(
         type=EventType.STATE_SNAPSHOT,
-        snapshot={"message": "分镜图像已生成。", "detail": "请查看output/images/目录"},
+        snapshot={
+            "message": f"分镜 {scene_index} 图像已生成。",
+            "detail": "请查看output/images/目录",
+        },
     )
 
 

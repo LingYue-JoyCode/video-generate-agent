@@ -1,12 +1,8 @@
 import json
-import os
 from pydantic_ai import Agent, RunContext
 from agents.image_agent import ImageAgentDeps, image_agent
-from utils.comfyui import generate_image
-from utils.edge_tts import generate_audio_for_script
 from utils.llm import chat_model
 from ag_ui.core import EventType, StateSnapshotEvent
-from utils.config import system_prompt
 
 scene_agent = Agent(model=chat_model, output_type=list[str])
 
@@ -34,19 +30,12 @@ def generate_scenes_and_images(ctx: RunContext) -> str:
 6) 清理细节：每个数组元素应去除首尾多余空白，但内部应保留原文换行与空格。
 7) 严格输出：不要包含解释、标题、编号、注释或多余字符；不要使用 Markdown 或代码块包装。
 
-{system_prompt}
+最后需要调用generate_scenes工具进行场景的生成。
 """
 
 
 @scene_agent.tool_plain
-async def send_current_plan(current_plan: str) -> StateSnapshotEvent:
-    return StateSnapshotEvent(
-        type=EventType.STATE_SNAPSHOT, snapshot={"message": current_plan}
-    )
-
-
-@scene_agent.tool_plain
-async def generate_image_audio(scripts: list[str]) -> StateSnapshotEvent:
+async def generate_scenes(scripts: list[str]) -> StateSnapshotEvent:
     with open("output/character_settings.json", "r", encoding="utf-8") as f:
         character_settings = f.read()
 
