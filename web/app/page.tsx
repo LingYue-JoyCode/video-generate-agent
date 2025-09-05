@@ -1,7 +1,7 @@
 "use client";
 import "@copilotkit/react-ui/styles.css";
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCoAgentStateRender } from "@copilotkit/react-core";
+import { useCoAgentStateRender, useCoAgent } from "@copilotkit/react-core";
 import React, { useRef, useState, useEffect } from "react";
 import { FileTree } from "./components/FileTree";
 import { FilePreview } from "./components/FilePreview";
