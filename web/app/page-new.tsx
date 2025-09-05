@@ -1,15 +1,10 @@
 "use client";
 import "@copilotkit/react-ui/styles.css";
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCoAgentStateRender, useCoAgent } from "@copilotkit/react-core";
+import { useCoAgentStateRender } from "@copilotkit/react-core";
 import React, { useRef, useState, useEffect } from "react";
 import { FileTree } from "./components/FileTree";
 import { FilePreview } from "./components/FilePreview";
-import { AgentStateDisplay } from "./components/AgentStateDisplay";
-import {
-  ProgressIndicator,
-  videoGenerationSteps,
-} from "./components/ProgressIndicator";
 
 type AgentState = {
   message: string;
@@ -31,24 +26,21 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [sidebarWidth, setSidebarWidth] = useState(300);
   const [previewWidth, setPreviewWidth] = useState(400);
-  const [showAgentPanel, setShowAgentPanel] = useState(false);
   const sidebarDragging = useRef(false);
   const previewDragging = useRef(false);
 
   // 获取文件树数据
   useEffect(() => {
-    window.setInterval(() => {
-      fetch("/api/file-tree")
-        .then((res) => res.json())
-        .then((data) => setFileTreeData(data))
-        .catch((err) => {
-          console.error("Failed to load file tree:", err);
-          // 使用 mock 数据作为备用
-          import("./mock").then(({ mockdata }) => {
-            setFileTreeData(mockdata as FileNode);
-          });
+    fetch("/api/file-tree")
+      .then(res => res.json())
+      .then(data => setFileTreeData(data))
+      .catch(err => {
+        console.error("Failed to load file tree:", err);
+        // 使用 mock 数据作为备用
+        import("./mock").then(({ mockdata }) => {
+          setFileTreeData(mockdata as FileNode);
         });
-    }, 3000);
+      });
   }, []);
 
   // 拖拽事件处理
@@ -85,22 +77,23 @@ export default function App() {
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-
+    
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
   });
 
-  // CopilotKit 状态渲染
-  useCoAgentStateRender<AgentState>({
-    name: "main_agent",
-    render: ({ state }) => {
-      if (!state.message)
-        return <div className="text-sm text-gray-500">等待 Agent 启动...</div>;
-      return <AgentStateDisplay state={state} />;
-    },
-  });
+  // CopilotKit 状态渲染 - 暂时禁用
+  // const AgentStateComponent = useCoAgentStateRender<AgentState>({
+  //   name: "main_agent",
+  //   render: ({ state }) => {
+  //     if (!state.message) return null;
+  //     return (
+  //       <div>Agent State</div>
+  //     );
+  //   },
+  // });
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -109,27 +102,18 @@ export default function App() {
         className="bg-white border-r border-gray-300 flex flex-col"
         style={{ width: sidebarWidth }}
       >
-        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
           <h2 className="font-semibold text-gray-800">输出文件</h2>
-          {/* <button
-            onClick={() => setShowAgentPanel(!showAgentPanel)}
-            className="text-sm px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors"
-          >
-            {showAgentPanel ? "隐藏状态" : "显示状态"}
-          </button> */}
         </div>
         <div className="flex-1 overflow-hidden">
           {fileTreeData ? (
-            <FileTree
-              data={fileTreeData}
+            <FileTree 
+              data={fileTreeData} 
               onFileSelect={(file) => setSelectedFile(file)}
             />
           ) : (
             <div className="flex items-center justify-center h-32 text-gray-500">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <div>加载中...</div>
-              </div>
+              加载中...
             </div>
           )}
         </div>
@@ -141,33 +125,11 @@ export default function App() {
         onMouseDown={handleSidebarMouseDown}
       />
 
-      {/* 中间区域 */}
+      {/* 中间聊天区域 */}
       <div className="flex-1 flex flex-col bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-        {/* Agent状态面板 */}
-        {showAgentPanel && (
-          <div className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                <h3 className="font-medium text-gray-800">AI Agent 状态</h3>
-              </div>
-              <div className="mb-3">
-                <div className="text-sm text-gray-500">
-                  Agent 状态将在这里显示
-                </div>
-              </div>
-              <ProgressIndicator
-                steps={videoGenerationSteps}
-                currentStep="novel_creation"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* 聊天区域 */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="h-full w-full">
-            <CopilotChat className="h-full w-full shadow-lg bg-white border border-gray-200 overflow-hidden" />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="h-[80vh] w-full max-w-4xl">
+            <CopilotChat className="h-full w-full rounded-xl shadow-lg bg-white border border-gray-200" />
           </div>
         </div>
       </div>
@@ -185,9 +147,6 @@ export default function App() {
       >
         <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
           <h2 className="font-semibold text-gray-800">文件预览</h2>
-          {selectedFile && (
-            <p className="text-xs text-gray-500 mt-1">{selectedFile.name}</p>
-          )}
         </div>
         <div className="flex-1 overflow-hidden">
           <FilePreview file={selectedFile} />

@@ -1,10 +1,8 @@
 import json
-import os
 from pydantic_ai import Agent, RunContext
 from agents.image_agent import ImageAgentDeps, image_agent
-from utils.comfyui import generate_image
-from utils.edge_tts import generate_audio_for_script
 from utils.llm import chat_model
+from ag_ui.core import EventType, StateSnapshotEvent
 
 scene_agent = Agent(model=chat_model, output_type=list[str])
 
@@ -31,11 +29,13 @@ def generate_scenes_and_images(ctx: RunContext) -> str:
 5) 长度建议：建议每段控制在约 50–300 字之间（根据情节密度可适当调整），但不要人为拆分导致句义中断。
 6) 清理细节：每个数组元素应去除首尾多余空白，但内部应保留原文换行与空格。
 7) 严格输出：不要包含解释、标题、编号、注释或多余字符；不要使用 Markdown 或代码块包装。
+
+最后需要调用generate_scenes工具进行场景的生成。
 """
 
 
-@scene_agent.tool
-async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
+@scene_agent.tool_plain
+async def generate_scenes(scripts: list[str]) -> StateSnapshotEvent:
     with open("output/character_settings.json", "r", encoding="utf-8") as f:
         character_settings = f.read()
 
@@ -51,23 +51,10 @@ async def generate_image_audio(ctx: RunContext, scripts: list[str]) -> None:
     with open("output/scenes.json", "w", encoding="utf-8") as f:
         json.dump(scene, f, ensure_ascii=False, indent=4)
 
-    for idx, item in enumerate(scene):
-        # 1) 生成分镜图像
-        # generate_image(
-        #     prompt_text=item["sd_prompt"],
-        #     save_path=f"output/images/scene_{idx}.png",
-        # )
-        # 2) 保存脚本文本
-        script_path = f"output/scripts/scene_{idx}.txt"
-        os.makedirs("output/scripts", exist_ok=True)
-        with open(script_path, "w", encoding="utf-8") as sf:
-            sf.write(item["script"])
-        # 3) 生成音频与字幕
-        audio_path = f"output/audio/scene_{idx}.mp3"
-        srt_path = f"output/subtitles/scene_{idx}.srt"
-        generate_audio_for_script(script_path=script_path, audio_path=audio_path, srt_path=srt_path)
-        
-    print("场景图像、配音与字幕生成完成")
+    return StateSnapshotEvent(
+        type=EventType.STATE_SNAPSHOT,
+        snapshot={"message": "分镜生成完成"},
+    )
 
 
 if __name__ == "__main__":

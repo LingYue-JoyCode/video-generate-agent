@@ -6,6 +6,7 @@ import {
 import { HttpAgent } from "@ag-ui/client";
 import { NextRequest } from "next/server";
 
+
 // 1. You can use any service adapter here for multi-agent support. We use
 //    the empty adapter since we're only using one agent.
 const serviceAdapter = new ExperimentalEmptyAdapter();
@@ -15,7 +16,7 @@ const serviceAdapter = new ExperimentalEmptyAdapter();
 const runtime = new CopilotRuntime({
   agents: {
     // Our AG-UI endpoint URL
-    my_agent: new HttpAgent({ url: "http://localhost:8000/agent" }),
+    main_agent: new HttpAgent({ url: "http://localhost:8000/agent" }),
   },
 });
 
